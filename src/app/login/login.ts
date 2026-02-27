@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth';
+import { ToastService } from '../services/toast';
 import { Router } from '@angular/router';
 
 @Component({
@@ -17,6 +18,7 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private formBuilder = inject(FormBuilder);
+  private toast = inject(ToastService);
 
   constructor() {
     this.loginForm = this.formBuilder.group({
@@ -32,14 +34,14 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
     this.authService.login(email, password).subscribe({
       next: (res) => {
-        console.log('Login bem-sucedido:', res);
         localStorage.setItem('token', res.token);
         this.loading = false;
-        this.router.navigate(['/clientes']);
+        this.toast.success('Login realizado com sucesso!');
+        this.router.navigate(['/ordens-servico']);
       },
       error: (err) => {
-        console.error('Erro no login:', err);
-        this.error = err.error?.message || 'Erro ao autenticar.';
+        this.error = err.error?.message || 'E-mail ou senha inválidos.';
+        this.toast.error(this.error!);
         this.loading = false;
       },
     });

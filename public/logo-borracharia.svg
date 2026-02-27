@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="tireGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2a2a2a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#1976d2;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#1565c0;stop-opacity:0" />
+    </radialGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="deepShadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Outer tire ring (main rubber) - with gradient -->
+  <circle cx="120" cy="120" r="85" fill="url(#tireGradient)" stroke="#0a0a0a" stroke-width="2" filter="url(#deepShadow)"/>
+
+  <!-- Tire texture lines (inner surface) -->
+  <g stroke="#1a1a1a" stroke-width="1" opacity="0.4">
+    <circle cx="120" cy="120" r="80" />
+    <circle cx="120" cy="120" r="75" />
+    <circle cx="120" cy="120" r="65" />
+  </g>
+
+  <!-- White wall/sidewall -->
+  <circle cx="120" cy="120" r="60" fill="#f5f5f5" stroke="#333" stroke-width="1.5"/>
+
+  <!-- Inner white wall detail -->
+  <circle cx="120" cy="120" r="55" fill="none" stroke="#ddd" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Center hub - more prominent -->
+  <circle cx="120" cy="120" r="28" fill="#1976d2" stroke="#0d47a1" stroke-width="2" filter="url(#glow)"/>
+
+  <!-- Glow effect around hub -->
+  <circle cx="120" cy="120" r="30" fill="none" stroke="url(#hubGlow)" stroke-width="3" opacity="0.6"/>
+
+  <!-- Hub center cap -->
+  <circle cx="120" cy="120" r="16" fill="#0d47a1" stroke="#1976d2" stroke-width="1"/>
+
+  <!-- Center dot -->
+  <circle cx="120" cy="120" r="6" fill="#2196F3"/>
+
+  <!-- Tire tread/sulcos pattern -->
+  <g stroke="#333" stroke-width="1.8" stroke-linecap="round" opacity="0.5">
+    <line x1="120" y1="35" x2="120" y2="45" />
+    <line x1="157" y1="38" x2="152" y2="50" />
+    <line x1="186" y1="62" x2="178" y2="72" />
+    <line x1="204" y1="94" x2="194" y2="102" />
+    <line x1="205" y1="120" x2="195" y2="120" />
+    <line x1="204" y1="146" x2="194" y2="138" />
+    <line x1="186" y1="178" x2="178" y2="168" />
+    <line x1="157" y1="202" x2="152" y2="190" />
+    <line x1="120" y1="205" x2="120" y2="195" />
+    <line x1="83" y1="202" x2="88" y2="190" />
+    <line x1="54" y1="178" x2="62" y2="168" />
+    <line x1="36" y1="146" x2="46" y2="138" />
+    <line x1="35" y1="120" x2="45" y2="120" />
+    <line x1="36" y1="94" x2="46" y2="102" />
+    <line x1="54" y1="62" x2="62" y2="72" />
+    <line x1="83" y1="38" x2="88" y2="50" />
+  </g>
+
+  <!-- Lug nuts/bolts (6) with metallic look -->
+  <g>
+    <!-- Top bolt -->
+    <circle cx="120" cy="82" r="4" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+    <circle cx="120" cy="82" r="2.5" fill="#e8e8e8" opacity="0.7"/>
+
+    <!-- Top-right bolt -->
+    <circle cx="156" cy="97" r="4" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+    <circle cx="156" cy="97" r="2.5" fill="#e8e8e8" opacity="0.7"/>
+
+    <!-- Bottom-right bolt -->
+    <circle cx="156" cy="143" r="4" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+    <circle cx="156" cy="143" r="2.5" fill="#e8e8e8" opacity="0.7"/>
+
+    <!-- Bottom bolt -->
+    <circle cx="120" cy="158" r="4" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+    <circle cx="120" cy="158" r="2.5" fill="#e8e8e8" opacity="0.7"/>
+
+    <!-- Bottom-left bolt -->
+    <circle cx="84" cy="143" r="4" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+    <circle cx="84" cy="143" r="2.5" fill="#e8e8e8" opacity="0.7"/>
+
+    <!-- Top-left bolt -->
+    <circle cx="84" cy="97" r="4" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+    <circle cx="84" cy="97" r="2.5" fill="#e8e8e8" opacity="0.7"/>
+  </g>
+
+  <!-- Shine/reflection on white wall -->
+  <ellipse cx="95" cy="85" rx="18" ry="22" fill="#ffffff" opacity="0.15"/>
+
+  <!-- Additional highlight for 3D effect -->
+  <ellipse cx="145" cy="95" rx="12" ry="8" fill="#ffffff" opacity="0.08"/>
+</svg>
+

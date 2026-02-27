@@ -32,14 +32,14 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
     this.authService.login(email, password).subscribe({
       next: (res) => {
+        console.log('Login bem-sucedido:', res);
         localStorage.setItem('token', res.token);
-        this.router.navigate(['/']);
+        this.loading = false;
+        this.router.navigate(['/clientes']);
       },
       error: (err) => {
+        console.error('Erro no login:', err);
         this.error = err.error?.message || 'Erro ao autenticar.';
-        this.loading = false;
-      },
-      complete: () => {
         this.loading = false;
       },
     });

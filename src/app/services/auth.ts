@@ -13,10 +13,10 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8089/api/auth/login'; // Ajuste conforme backend
+  private apiUrl = '/api/auth/login';
   private http = inject(HttpClient);
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.apiUrl, { email, password });
+    return this.http.post<LoginResponse>(this.apiUrl, { email, senha: password });
   }
 }

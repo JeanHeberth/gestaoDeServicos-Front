@@ -4,6 +4,7 @@ import { ClienteService, Cliente } from '../services/cliente';
 import { ToastService } from '../services/toast';
 import { ConfirmService } from '../services/confirm';
 import { EditModalService } from '../services/edit-modal';
+import { WebSocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-clientes',
@@ -207,6 +208,7 @@ export class ClientesComponent implements OnInit {
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
   private editModal = inject(EditModalService);
+  private websocketService = inject(WebSocketService);
 
   clientes: Cliente[] = [];
   loading = false;
@@ -215,6 +217,7 @@ export class ClientesComponent implements OnInit {
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
     this.carregar();
+    this.iniciarWebSocket();
   }
 
   carregar() {
@@ -264,6 +267,24 @@ export class ClientesComponent implements OnInit {
     this.clienteService.deletar(id).subscribe({
       next: () => { this.toast.success('Cliente excluído com sucesso!'); this.carregar(); },
       error: () => { this.toast.error('Erro ao excluir cliente.'); },
+    });
+  }
+
+  iniciarWebSocket() {
+    const websocketUrl = 'ws://localhost:8089/ws/clientes';
+    this.websocketService.connect(websocketUrl);
+
+    this.websocketService.onMessage().subscribe((data: any) => {
+      if (data.type === 'clienteAtualizado') {
+        const clienteAtualizado = data.payload;
+        const index = this.clientes.findIndex((cliente) => cliente.id === clienteAtualizado.id);
+        if (index !== -1) {
+          this.clientes[index] = clienteAtualizado;
+        } else {
+          this.clientes.push(clienteAtualizado);
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 }

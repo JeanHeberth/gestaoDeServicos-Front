@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
-import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { UsuarioService, Usuario } from '../services/usuario';
 import { ToastService } from '../services/toast';
 import { ConfirmService } from '../services/confirm';
 import { EditModalService } from '../services/edit-modal';
+import { WebSocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-usuarios',
@@ -62,15 +63,11 @@ import { EditModalService } from '../services/edit-modal';
                   </td>
                   <td>{{ usuario.email }}</td>
                   <td>
-                    <div class="roles">
-                      @for (role of usuario.roles; track role) {
-                        <span class="badge"
-                          [class.badge-amber]="role === 'ADMIN'"
-                          [class.badge-blue]="role === 'USER'">
-                          {{ role }}
-                        </span>
-                      }
-                    </div>
+                    <span class="badge"
+                      [class.badge-amber]="usuario.role === 'ADMINISTRADOR'"
+                      [class.badge-blue]="usuario.role === 'USUARIO'">
+                      {{ usuario.role }}
+                    </span>
                   </td>
                   <td class="td-actions">
                     <button class="btn-icon" (click)="editar(usuario)" title="Editar">
@@ -170,20 +167,20 @@ import { EditModalService } from '../services/edit-modal';
   `]
 })
 export class UsuariosComponent implements OnInit {
-  private platformId = inject(PLATFORM_ID);
   private usuarioService = inject(UsuarioService);
   private cdr = inject(ChangeDetectorRef);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
   private editModal = inject(EditModalService);
+  private websocketService = inject(WebSocketService);
 
   usuarios: Usuario[] = [];
   loading = false;
   error: string | null = null;
 
   ngOnInit() {
-    if (!isPlatformBrowser(this.platformId)) return;
     this.carregar();
+    this.iniciarWebSocket();
   }
 
   carregar() {
@@ -203,9 +200,9 @@ export class UsuariosComponent implements OnInit {
       fields: [
         { key: 'nome', label: 'Nome', type: 'text', value: usuario.nome, placeholder: 'Nome do usuário' },
         { key: 'email', label: 'E-mail', type: 'email', value: usuario.email, disabled: true },
-        { key: 'roles', label: 'Perfis', type: 'multi-select', value: usuario.roles, options: [
-          { value: 'USER', label: 'Usuário' },
-          { value: 'ADMIN', label: 'Administrador' },
+        { key: 'role', label: 'Perfil', type: 'select', value: usuario.role, options: [
+          { value: 'USUARIO', label: 'USUARIO' },
+          { value: 'ADMINISTRADOR', label: 'ADMINISTRADOR' },
         ]},
       ],
     });
@@ -215,7 +212,7 @@ export class UsuariosComponent implements OnInit {
     const id = usuario.id;
     if (!id) return;
 
-    const updated = { ...usuario, nome: result['nome'] as string, roles: result['roles'] as string[] };
+    const updated = { ...usuario, nome: result['nome'] as string, role: result['role'] as string };
     this.usuarioService.atualizar(id, updated).subscribe({
       next: () => { this.toast.success('Usuário atualizado com sucesso!'); this.carregar(); },
       error: () => { this.toast.error('Erro ao atualizar usuário.'); },
@@ -234,6 +231,24 @@ export class UsuariosComponent implements OnInit {
     this.usuarioService.deletar(id).subscribe({
       next: () => { this.toast.success('Usuário excluído com sucesso!'); this.carregar(); },
       error: () => { this.toast.error('Erro ao excluir usuário.'); },
+    });
+  }
+
+  iniciarWebSocket() {
+    const websocketUrl = 'ws://localhost:8089/ws/usuarios';
+    this.websocketService.connect(websocketUrl);
+
+    this.websocketService.onMessage().subscribe((data: any) => {
+      if (data.type === 'usuarioAtualizado') {
+        const usuarioAtualizado = data.payload;
+        const index = this.usuarios.findIndex((usuario) => usuario.id === usuarioAtualizado.id);
+        if (index !== -1) {
+          this.usuarios[index] = usuarioAtualizado;
+        } else {
+          this.usuarios.push(usuarioAtualizado);
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 }

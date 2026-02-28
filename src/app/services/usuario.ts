@@ -7,7 +7,7 @@ export interface Usuario {
   nome: string;
   email: string;
   senha?: string;
-  roles: string[];
+  role: string; // Alterado de roles: string[] para role: string
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,4 +35,3 @@ export class UsuarioService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
-

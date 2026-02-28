@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService, Toast } from '../services/toast';
 import { Subscription } from 'rxjs';
@@ -120,6 +120,7 @@ import { Subscription } from 'rxjs';
 })
 export class ToastComponent implements OnInit, OnDestroy {
   private toastService = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
   private subs: Subscription[] = [];
   toasts: Toast[] = [];
 
@@ -127,9 +128,11 @@ export class ToastComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.toastService.toast$.subscribe((toast) => {
         this.toasts.push(toast);
+        this.cdr.detectChanges(); // Força a detecção de mudanças
       }),
       this.toastService.remove$.subscribe((id) => {
         this.toasts = this.toasts.filter((t) => t.id !== id);
+        this.cdr.detectChanges(); // Força a detecção de mudanças
       })
     );
   }
@@ -142,4 +145,3 @@ export class ToastComponent implements OnInit, OnDestroy {
     this.toastService.remove(id);
   }
 }
-

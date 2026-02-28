@@ -6,6 +6,7 @@ import { ToastService } from '../services/toast';
 import { ConfirmService } from '../services/confirm';
 import { EditModalService } from '../services/edit-modal';
 import { forkJoin } from 'rxjs';
+import {WebSocketService} from '../services/websocket.service';
 
 @Component({
   selector: 'app-ordens-servico',
@@ -185,6 +186,7 @@ export class OrdensServicoComponent implements OnInit {
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
   private editModal = inject(EditModalService);
+  private websocketService = inject(WebSocketService);
 
   ordens: OrdemServico[] = [];
   clientesMap: Record<string, string> = {};
@@ -194,28 +196,49 @@ export class OrdensServicoComponent implements OnInit {
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
     this.carregar();
+    this.iniciarWebSocket();
   }
 
   carregar() {
     this.loading = true;
-    this.error = null;
+    this.cdr.detectChanges(); // Força a detecção de mudanças
+
     forkJoin({
       ordens: this.osService.listar(),
       clientes: this.clienteService.listar(),
     }).subscribe({
       next: ({ ordens, clientes }) => {
-        this.clientesMap = {};
-        clientes.forEach((c: Cliente) => { this.clientesMap[c.id] = c.nome; });
         this.ordens = ordens;
+        this.clientesMap = clientes.reduce((map, cliente) => {
+          map[cliente.id] = cliente.nome;
+          return map;
+        }, {} as Record<string, string>);
         this.loading = false;
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // Força a detecção de mudanças
       },
-      error: () => {
-        this.error = 'Erro ao carregar ordens de serviço.';
-        this.toast.error(this.error);
+      error: (err) => {
+        this.error = err.message || 'Erro ao carregar ordens de serviço';
         this.loading = false;
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // Força a detecção de mudanças
       },
+    });
+  }
+
+  iniciarWebSocket() {
+    const websocketUrl = 'ws://localhost:8089/ws/ordens'; // Substitua pela URL do WebSocket do backend
+    this.websocketService.connect(websocketUrl);
+
+    this.websocketService.onMessage().subscribe((data) => {
+      if (data.type === 'ordemAtualizada') {
+        const ordemAtualizada = data.payload;
+        const index = this.ordens.findIndex((os) => os.id === ordemAtualizada.id);
+        if (index !== -1) {
+          this.ordens[index] = ordemAtualizada;
+        } else {
+          this.ordens.push(ordemAtualizada);
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 

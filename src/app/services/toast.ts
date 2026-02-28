@@ -34,6 +34,10 @@ export class ToastService {
 
   private show(message: string, type: Toast['type']) {
     const id = ++this.counter;
+    if (!message || message.trim() === '') {
+      console.error('Toast message is empty or undefined.');
+      return;
+    }
     this.toastSubject.next({ id, message, type });
 
     setTimeout(() => {
@@ -45,4 +49,3 @@ export class ToastService {
     this.removeSubject.next(id);
   }
 }
-

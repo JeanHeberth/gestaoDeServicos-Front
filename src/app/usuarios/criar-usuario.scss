@@ -1,8 +1,0 @@
-/* Estilos específicos do componente criar-usuario */
-.page { padding: 2rem; min-height: 100vh; }
-.page-header { margin-bottom: 1.5rem }
-.card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-label { display:block; margin-bottom: 1rem; font-weight:500 }
-input, select { width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px }
-/* .btn-primary removido — usa o estilo global em src/styles.scss */
-.btn-primary:disabled { background-color:#ccc; cursor:not-allowed }

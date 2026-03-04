@@ -1,0 +1,53 @@
+import { Component, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth';
+import { ToastService } from '../services/toast';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './login.html',
+  styleUrls: ['./login.scss'],
+})
+export class LoginComponent {
+  loginForm: FormGroup;
+  loading = false;
+  error: string | null = null;
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private formBuilder = inject(FormBuilder);
+  private toast = inject(ToastService);
+
+  constructor() {
+    this.loginForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
+
+  onSubmit() {
+    if (this.loginForm.invalid) return;
+    this.loading = true;
+    this.error = null;
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe({
+      next: (res) => {
+        localStorage.setItem('token', res.token);
+        this.loading = false;
+        this.toast.success('Login realizado com sucesso!');
+        this.router.navigate(['/ordens-servico']);
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'E-mail ou senha inválidos.';
+        this.toast.error(this.error!);
+        this.loading = false;
+      },
+    });
+  }
+}
+
+export { LoginComponent as Login };
